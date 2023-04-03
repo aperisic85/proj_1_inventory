@@ -25,28 +25,30 @@ impl Inventory {
         }
     }
 
-    fn giveaway(&mut self, user_pref: &Option<ShirtColor>) -> ShirtColor {
+    fn giveaway(&mut self, user_pref: &Option<ShirtColor>) -> Result<ShirtColor, &'static str> {
         // user_pref.unwrap_or_else(|| self.most_stocked())
         match user_pref {
             Some(ShirtColor::Blue) => {
-                let pos = self
-                    .shirts
-                    .iter()
-                    .position(|x| *x == ShirtColor::Blue)
-                    .expect("not found");
-                self.shirts.remove(pos);
-                ShirtColor::Blue
+                let pos = self.shirts.iter().position(|x| *x == ShirtColor::Blue);
+                match pos {
+                    Some(x) => {
+                        self.shirts.remove(x);
+                        Ok(ShirtColor::Blue)
+                    }
+                    None => Err("We dont have it anymore"),
+                }
             }
             Some(ShirtColor::Red) => {
-                let pos = self
-                    .shirts
-                    .iter()
-                    .position(|x| *x == ShirtColor::Red)
-                    .expect("not found");
-                self.shirts.remove(pos);
-                ShirtColor::Red
+                let pos = self.shirts.iter().position(|x| *x == ShirtColor::Red);
+                match pos {
+                    Some(x) => {
+                        self.shirts.remove(x);
+                        Ok(ShirtColor::Red)
+                    }
+                    None => Err("We dont have it anymore"),
+                }
             }
-            None => self.most_stocked(),
+            None => Ok(self.most_stocked()),
         }
     }
 }
@@ -72,10 +74,10 @@ fn main() {
     println!(" inv state: {:?}", inv.shirts);
 
     println!("Giveaway for user 1: {:?}", inv.giveaway(&user1));
-    println!("Giveaway for user 1: {:?}", inv.giveaway(&user2));
-    println!("Giveaway for user 1: {:?}", inv.giveaway(&user2));
-    println!("Giveaway for user 1: {:?}", inv.giveaway(&user2));
-    println!("Giveaway for user 1: {:?}", inv.giveaway(&user2));
+    println!("Giveaway for user 2: {:?}", inv.giveaway(&user2));
+    println!("Giveaway for user 2: {:?}", inv.giveaway(&user2));
+    println!("Giveaway for user 2: {:?}", inv.giveaway(&user2));
+    println!("Giveaway for user 2: {:?}", inv.giveaway(&user2));
     println!("Giveaway for user 3: {:?}", inv.giveaway(&user3));
-    println!(" inv state: {:?}", inv.shirts);
+    println!(" inv new state: {:?}", inv.shirts);
 }
