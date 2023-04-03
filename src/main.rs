@@ -9,7 +9,7 @@ struct Inventory {
 }
 
 impl Inventory {
-    fn most_stocked(&self) -> ShirtColor {
+    fn most_stocked<'a> (&self) -> &'a ShirtColor {
         let mut red = 0;
         let mut blue = 0;
         for m in &self.shirts {
@@ -19,35 +19,28 @@ impl Inventory {
             }
         }
         if red >= blue {
-            ShirtColor::Red
+            &ShirtColor::Red
         } else {
-            ShirtColor::Blue
+            &ShirtColor::Blue
         }
     }
 
-    fn giveaway(&mut self, user_pref: &Option<ShirtColor>) -> Result<ShirtColor, &'static str> {
+    fn giveaway<'a>(&mut self, user_pref: & 'a Option<ShirtColor>) -> Result<& 'a ShirtColor, &'static str> {
         // user_pref.unwrap_or_else(|| self.most_stocked())
         match user_pref {
-            Some(ShirtColor::Blue) => {
-                let pos = self.shirts.iter().position(|x| *x == ShirtColor::Blue);
+            Some(user_pref) => {
+                let pos = self.shirts.iter().position(|x| *x == *user_pref);
                 match pos {
                     Some(x) => {
+                        
+                        
                         self.shirts.remove(x);
-                        Ok(ShirtColor::Blue)
+                        Ok(user_pref)
                     }
                     None => Err("We dont have it anymore"),
                 }
             }
-            Some(ShirtColor::Red) => {
-                let pos = self.shirts.iter().position(|x| *x == ShirtColor::Red);
-                match pos {
-                    Some(x) => {
-                        self.shirts.remove(x);
-                        Ok(ShirtColor::Red)
-                    }
-                    None => Err("We dont have it anymore"),
-                }
-            }
+            
             None => Ok(self.most_stocked()),
         }
     }
